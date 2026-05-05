@@ -87,6 +87,25 @@ const patternData = {
   }
 };
 
+const seriesData = [
+  {
+    id: "pattern",
+    eyebrow: "Pattern",
+    title: "钩针软糖图解",
+    description: "原创玩偶和小物的文字图解档案。每份图解都有独立页面、图片和多语言记号。",
+    image: "assets/larvitar-pattern-2.jpeg",
+    href: "#/pattern"
+  },
+  {
+    id: "gallery",
+    eyebrow: "Gallery",
+    title: "OC 定制展示",
+    description: "角色定制、成品照片和灵感记录。这里更像作品集，不是商品列表。",
+    image: "assets/larvitar-pattern-1.jpeg",
+    href: "#/gallery"
+  }
+];
+
 const palette = {
   paper: "#eaf8fb",
   ink: "#111111",
@@ -134,6 +153,11 @@ function render() {
     return;
   }
 
+  if (route.type === "patternIndex") {
+    app.innerHTML = renderPatternIndex();
+    return;
+  }
+
   if (route.type === "about") {
     app.innerHTML = renderAbout();
     return;
@@ -149,15 +173,19 @@ function render() {
     return;
   }
 
-  app.innerHTML = renderPatternList();
+  app.innerHTML = renderHome();
 }
 
 function getRoute() {
   const hash = window.location.hash || "#/";
   const parts = hash.replace(/^#\/?/, "").split("/").filter(Boolean);
 
-  if (parts[0] === "patterns" && parts[1]) {
+  if (parts[0] === "pattern" && parts[1]) {
     return { type: "pattern", id: parts[1] };
+  }
+
+  if (parts[0] === "pattern") {
+    return { type: "patternIndex" };
   }
 
   if (parts[0] === "about") {
@@ -175,12 +203,50 @@ function getRoute() {
   return { type: "list" };
 }
 
-function renderPatternList() {
+function renderHome() {
+  const rows = seriesData
+    .map((series) => {
+      return `
+        <a class="series-row" href="${series.href}">
+          <div>
+            <p class="eyebrow">${series.eyebrow}</p>
+            <h2>${series.title}</h2>
+            <p>${series.description}</p>
+          </div>
+          <img src="${series.image}" alt="" />
+        </a>
+      `;
+    })
+    .join("");
+
+  return `
+    <section class="home-hero">
+      <div class="home-portrait">
+        <img src="assets/larvitar-pattern-1.jpeg" alt="" />
+        <span class="portrait-doodle heart">♥</span>
+        <span class="portrait-doodle face">^^</span>
+      </div>
+      <div class="home-intro">
+        <p class="eyebrow">Puffy Kitty Studio</p>
+        <h1>把毛线变成软糖一样的小角色。</h1>
+        <p>
+          这里是我的钩针图解、OC 定制和制作记录。页面会保持手帐式的浅蓝底、圆润字和图解纸张感，
+          像一个慢慢扩展的创作档案。
+        </p>
+      </div>
+    </section>
+    <section class="series-list" aria-label="作品系列">
+      ${rows}
+    </section>
+  `;
+}
+
+function renderPatternIndex() {
   const cards = Object.entries(patternData)
     .map(([id, pattern]) => {
       return `
         <article class="pattern-card list-card">
-          <a class="card-link" href="#/patterns/${id}">
+          <a class="card-link" href="#/pattern/${id}">
             ${renderPreview(pattern, "pattern-preview")}
             <div class="pattern-body">
               <div class="pattern-meta">
@@ -198,11 +264,14 @@ function renderPatternList() {
     .join("");
 
   return `
-    <div class="section-heading">
+    <section class="section">
+      <a class="back-link" href="#/">返回主页</a>
+      <div class="section-heading">
       <p class="eyebrow">Pattern Library</p>
-      <h2>图解列表</h2>
-    </div>
-    <div class="pattern-grid">${cards}</div>
+        <h2>钩针软糖图解</h2>
+      </div>
+      <div class="pattern-grid">${cards}</div>
+    </section>
   `;
 }
 
@@ -232,7 +301,8 @@ function renderPatternDetail(pattern, id) {
   const term = languages[selectedLanguage];
 
   return `
-    <a class="back-link" href="#/">${term.back}</a>
+    <section class="section detail-section">
+    <a class="back-link" href="#/pattern">${term.back}</a>
     <article class="detail-layout">
       <aside class="detail-aside">
         ${renderImageCarousel(pattern)}
@@ -266,6 +336,7 @@ function renderPatternDetail(pattern, id) {
         </div>
       </section>
     </article>
+    </section>
   `;
 }
 
@@ -327,6 +398,7 @@ function renderPatternSheet(pattern, language) {
 
 function renderAbout() {
   return `
+    <section class="section">
     <div class="split">
       <div>
         <p class="eyebrow">Workflow</p>
@@ -338,29 +410,35 @@ function renderAbout() {
         <p>下载图片和 PDF 会使用当前切换的语言版本。</p>
       </div>
     </div>
+    </section>
   `;
 }
 
 function renderGallery() {
   return `
+    <section class="section">
+    <a class="back-link" href="#/">返回主页</a>
     <div class="section-heading">
       <p class="eyebrow">Gallery</p>
-      <h2>图解旧稿</h2>
+      <h2>OC 定制展示</h2>
     </div>
     <div class="gallery-grid">
       <img src="assets/larvitar-pattern-2.jpeg" alt="拉鲁拉斯软糖图解旧稿 1" />
       <img src="assets/larvitar-pattern-1.jpeg" alt="拉鲁拉斯软糖图解旧稿 2" />
     </div>
+    </section>
   `;
 }
 
 function renderContact() {
   return `
+    <section class="section">
     <div class="contact">
       <p class="eyebrow">Contact</p>
       <h2>购买、授权或合作</h2>
       <p>邮箱：your-name@example.com</p>
     </div>
+    </section>
   `;
 }
 
