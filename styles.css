@@ -50,12 +50,16 @@ a {
   backdrop-filter: blur(12px);
 }
 
+.brand,
+.card-link {
+  color: var(--ink);
+  text-decoration: none;
+}
+
 .brand {
   display: inline-flex;
   align-items: center;
   gap: 12px;
-  color: var(--ink);
-  text-decoration: none;
 }
 
 .brand-mark {
@@ -125,7 +129,8 @@ nav a:hover {
 }
 
 .hero h1,
-.section h2 {
+.section h2,
+.pattern-detail h2 {
   margin: 0;
   line-height: 1.12;
 }
@@ -135,25 +140,19 @@ nav a:hover {
   max-width: 800px;
 }
 
-.hero p:not(.eyebrow) {
-  margin: 22px 0 0;
+.hero p:not(.eyebrow),
+.pattern-card p,
+.pattern-detail p,
+.language-panel p,
+.notes p,
+.contact p {
   color: var(--muted);
-  font-size: 18px;
-  max-width: 650px;
 }
 
-.button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 46px;
-  margin-top: 28px;
-  padding: 0 18px;
-  border-radius: 6px;
-  background: var(--ink);
-  color: #fff;
-  font-weight: 700;
-  text-decoration: none;
+.hero p:not(.eyebrow) {
+  margin: 22px 0 0;
+  font-size: 18px;
+  max-width: 650px;
 }
 
 .hero-panel {
@@ -202,6 +201,10 @@ nav a:hover {
   border-top: 1px solid var(--line);
 }
 
+.app-shell {
+  min-height: 52vh;
+}
+
 .section-heading {
   margin-bottom: 24px;
 }
@@ -212,7 +215,7 @@ nav a:hover {
 
 .pattern-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 18px;
 }
 
@@ -224,9 +227,18 @@ nav a:hover {
   box-shadow: var(--shadow);
 }
 
-.pattern-card-featured {
+.list-card {
+  transition: transform 160ms ease, box-shadow 160ms ease;
+}
+
+.list-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 22px 50px rgba(57, 48, 38, 0.12);
+}
+
+.card-link {
   display: grid;
-  grid-template-columns: minmax(260px, 0.62fr) minmax(0, 1.38fr);
+  height: 100%;
 }
 
 .pattern-preview {
@@ -236,12 +248,18 @@ nav a:hover {
 
 .crochet-preview {
   position: relative;
-  min-height: 620px;
+  min-height: 290px;
   overflow: hidden;
   background:
     linear-gradient(135deg, rgba(192, 138, 57, 0.24), transparent 48%),
     linear-gradient(315deg, rgba(76, 112, 135, 0.22), transparent 52%),
     #efe8df;
+}
+
+.compact-preview {
+  min-height: 320px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
 }
 
 .preview-loop {
@@ -255,14 +273,14 @@ nav a:hover {
 .loop-one {
   width: 220px;
   height: 130px;
-  top: 150px;
+  top: 56px;
   left: 12%;
 }
 
 .loop-two {
   width: 250px;
   height: 150px;
-  top: 245px;
+  top: 116px;
   left: 24%;
   border-color: rgba(182, 95, 114, 0.72);
 }
@@ -270,17 +288,17 @@ nav a:hover {
 .loop-three {
   width: 210px;
   height: 126px;
-  top: 350px;
+  top: 174px;
   left: 16%;
   border-color: rgba(111, 132, 103, 0.76);
 }
 
 .preview-hook {
   position: absolute;
-  top: 102px;
+  top: 20px;
   right: 18%;
   width: 18px;
-  height: 430px;
+  height: 260px;
   border-radius: 999px;
   background: var(--ink);
   transform: rotate(28deg);
@@ -300,7 +318,7 @@ nav a:hover {
 }
 
 .pattern-body {
-  padding: clamp(20px, 4vw, 36px);
+  padding: clamp(20px, 4vw, 32px);
 }
 
 .pattern-meta {
@@ -323,14 +341,76 @@ nav a:hover {
   font-weight: 700;
 }
 
-.pattern-card h3 {
+.pattern-card h2,
+.pattern-detail h2 {
   margin: 10px 0 8px;
-  font-size: clamp(26px, 3vw, 36px);
-  line-height: 1.15;
+  font-size: clamp(28px, 4vw, 44px);
 }
 
-.pattern-card p {
+.text-link,
+.back-link {
+  display: inline-flex;
+  margin-top: 12px;
+  color: var(--ink);
+  font-weight: 700;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+}
+
+.back-link {
+  margin: 0 0 20px;
+}
+
+.detail-layout {
+  display: grid;
+  grid-template-columns: minmax(240px, 0.48fr) minmax(0, 1fr);
+  gap: clamp(22px, 4vw, 44px);
+  align-items: start;
+}
+
+.detail-aside {
+  display: grid;
+  gap: 18px;
+  position: sticky;
+  top: 108px;
+}
+
+.language-panel {
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+}
+
+.language-panel p {
+  margin: 12px 0 0;
+}
+
+.language-toggle {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+.language-toggle button {
+  min-height: 38px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #fff;
   color: var(--muted);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.language-toggle button.is-active {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: #fff;
+}
+
+.pattern-detail {
+  min-width: 0;
 }
 
 .pattern-sheet {
@@ -351,7 +431,7 @@ nav a:hover {
 }
 
 .sheet-header p,
-.sheet-header h4 {
+.sheet-header h3 {
   margin: 0;
 }
 
@@ -362,7 +442,7 @@ nav a:hover {
   text-transform: uppercase;
 }
 
-.sheet-header h4 {
+.sheet-header h3 {
   margin-top: 4px;
   font-size: 28px;
   line-height: 1.2;
@@ -372,10 +452,14 @@ nav a:hover {
   margin-top: 22px;
 }
 
-.sheet-section h5 {
+.sheet-section h4 {
   margin: 0 0 12px;
   color: var(--sage);
   font-size: 18px;
+}
+
+.sheet-section p {
+  margin: 8px 0 0;
 }
 
 .round-list {
@@ -388,7 +472,7 @@ nav a:hover {
 
 .round-list li {
   display: grid;
-  grid-template-columns: minmax(70px, 0.28fr) minmax(0, 1fr);
+  grid-template-columns: minmax(70px, 0.24fr) minmax(0, 1fr);
   gap: 12px;
   align-items: baseline;
   padding: 8px 0;
@@ -402,12 +486,6 @@ nav a:hover {
 
 .round-list strong {
   font-size: 18px;
-}
-
-.sheet-note,
-.instruction-line,
-.abbreviations p {
-  margin: 10px 0 0;
 }
 
 .download-actions {
@@ -434,7 +512,8 @@ nav a:hover {
   color: var(--ink);
 }
 
-.download-actions button:hover {
+.download-actions button:hover,
+.language-toggle button:hover {
   transform: translateY(-1px);
 }
 
@@ -452,7 +531,12 @@ nav a:hover {
 .notes p,
 .contact p {
   margin: 0;
-  color: var(--muted);
+}
+
+code {
+  padding: 2px 5px;
+  border-radius: 4px;
+  background: #efe8df;
 }
 
 footer {
@@ -471,8 +555,13 @@ footer p {
     flex-direction: column;
   }
 
-  .hero {
+  .hero,
+  .detail-layout,
+  .split {
     grid-template-columns: 1fr;
+  }
+
+  .hero {
     min-height: auto;
   }
 
@@ -502,30 +591,8 @@ footer p {
     inset: 20px 7px;
   }
 
-  .pattern-card-featured,
-  .split {
-    grid-template-columns: 1fr;
-  }
-
-  .crochet-preview {
-    min-height: 280px;
-  }
-
-  .loop-one {
-    top: 56px;
-  }
-
-  .loop-two {
-    top: 116px;
-  }
-
-  .loop-three {
-    top: 174px;
-  }
-
-  .preview-hook {
-    top: 20px;
-    height: 260px;
+  .detail-aside {
+    position: static;
   }
 }
 
