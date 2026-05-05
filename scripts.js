@@ -44,6 +44,7 @@ const patternData = {
   "main-body": {
     fileName: "puffy-kitty-main-body",
     image: "assets/larvitar-pattern-2.jpeg",
+    images: ["assets/larvitar-pattern-2.jpeg", "assets/larvitar-pattern-1.jpeg"],
     category: "主体",
     title: {
       zh: "主体与头发",
@@ -103,7 +104,7 @@ window.addEventListener("hashchange", render);
 document.addEventListener("click", handleClick);
 render();
 
-function handleClick(event) {
+async function handleClick(event) {
   const languageButton = event.target.closest("[data-language]");
   const imageButton = event.target.closest("[data-download-image]");
   const pdfButton = event.target.closest("[data-download-pdf]");
@@ -116,12 +117,12 @@ function handleClick(event) {
 
   if (imageButton) {
     const pattern = patternData[imageButton.dataset.downloadImage];
-    downloadPatternImage(pattern, selectedLanguage);
+    await downloadPatternImage(pattern, selectedLanguage);
   }
 
   if (pdfButton) {
     const pattern = patternData[pdfButton.dataset.downloadPdf];
-    downloadPatternPdf(pattern, selectedLanguage);
+    await downloadPatternPdf(pattern, selectedLanguage);
   }
 }
 
@@ -135,6 +136,11 @@ function render() {
 
   if (route.type === "about") {
     app.innerHTML = renderAbout();
+    return;
+  }
+
+  if (route.type === "gallery") {
+    app.innerHTML = renderGallery();
     return;
   }
 
@@ -156,6 +162,10 @@ function getRoute() {
 
   if (parts[0] === "about") {
     return { type: "about" };
+  }
+
+  if (parts[0] === "gallery") {
+    return { type: "gallery" };
   }
 
   if (parts[0] === "contact") {
@@ -225,7 +235,7 @@ function renderPatternDetail(pattern, id) {
     <a class="back-link" href="#/">${term.back}</a>
     <article class="detail-layout">
       <aside class="detail-aside">
-        ${renderPreview(pattern, "pattern-preview compact-preview")}
+        ${renderImageCarousel(pattern)}
         <div class="language-panel">
           <p class="eyebrow">Terms</p>
           <div class="language-toggle" role="group" aria-label="切换钩针语言">
@@ -256,6 +266,26 @@ function renderPatternDetail(pattern, id) {
         </div>
       </section>
     </article>
+  `;
+}
+
+function renderImageCarousel(pattern) {
+  const images = pattern.images || [pattern.image].filter(Boolean);
+  const slides = images
+    .map((image, index) => {
+      return `
+        <figure class="carousel-slide">
+          <img src="${image}" alt="${pattern.title[selectedLanguage]} 图片 ${index + 1}" />
+        </figure>
+      `;
+    })
+    .join("");
+
+  return `
+    <div class="detail-gallery" aria-label="${pattern.title[selectedLanguage]} 图片">
+      <div class="image-carousel">${slides}</div>
+      <div class="carousel-hint">← swipe →</div>
+    </div>
   `;
 }
 
@@ -311,6 +341,19 @@ function renderAbout() {
   `;
 }
 
+function renderGallery() {
+  return `
+    <div class="section-heading">
+      <p class="eyebrow">Gallery</p>
+      <h2>图解旧稿</h2>
+    </div>
+    <div class="gallery-grid">
+      <img src="assets/larvitar-pattern-2.jpeg" alt="拉鲁拉斯软糖图解旧稿 1" />
+      <img src="assets/larvitar-pattern-1.jpeg" alt="拉鲁拉斯软糖图解旧稿 2" />
+    </div>
+  `;
+}
+
 function renderContact() {
   return `
     <div class="contact">
@@ -349,18 +392,29 @@ function getPrintablePattern(pattern, language) {
   };
 }
 
-function downloadPatternImage(pattern, language) {
+async function downloadPatternImage(pattern, language) {
+  await ensurePatternFont();
   const printable = getPrintablePattern(pattern, language);
   const canvas = createPatternCanvas(printable);
   downloadDataUrl(canvas.toDataURL("image/png"), `${printable.fileName}.png`);
 }
 
-function downloadPatternPdf(pattern, language) {
+async function downloadPatternPdf(pattern, language) {
+  await ensurePatternFont();
   const printable = getPrintablePattern(pattern, language);
   const canvas = createPatternCanvas(printable);
   const jpegDataUrl = canvas.toDataURL("image/jpeg", 0.95);
   const pdfBlob = createPdfFromJpeg(jpegDataUrl, canvas.width, canvas.height);
   downloadBlob(pdfBlob, `${printable.fileName}.pdf`);
+}
+
+async function ensurePatternFont() {
+  if (!document.fonts) {
+    return;
+  }
+
+  await document.fonts.load("25px 'cjkFonts 全瀨體'");
+  await document.fonts.ready;
 }
 
 function createPatternCanvas(pattern) {
@@ -380,12 +434,12 @@ function createPatternCanvas(pattern) {
 
   let y = 70;
   ctx.fillStyle = palette.rose;
-  ctx.font = "700 18px Comic Sans MS, Microsoft YaHei, sans-serif";
+  ctx.font = "700 18px 'cjkFonts 全瀨體', Comic Sans MS, Microsoft YaHei, sans-serif";
   ctx.fillText(pattern.subtitle, 64, y);
 
   y += 52;
   ctx.fillStyle = palette.ink;
-  ctx.font = "700 48px Comic Sans MS, Microsoft YaHei, sans-serif";
+  ctx.font = "700 48px 'cjkFonts 全瀨體', Comic Sans MS, Microsoft YaHei, sans-serif";
   ctx.fillText(pattern.title, 64, y);
 
   y += 38;
@@ -399,19 +453,19 @@ function createPatternCanvas(pattern) {
   y += 54;
   pattern.sections.forEach((section) => {
     ctx.fillStyle = palette.sage;
-    ctx.font = "700 26px Comic Sans MS, Microsoft YaHei, sans-serif";
+    ctx.font = "700 26px 'cjkFonts 全瀨體', Comic Sans MS, Microsoft YaHei, sans-serif";
     ctx.fillText(section.heading, 64, y);
     y += 34;
 
     section.lines.forEach((line) => {
-      const wrapped = wrapText(ctx, line, width - 128, "25px Comic Sans MS, Microsoft YaHei, sans-serif");
+      const wrapped = wrapText(ctx, line, width - 128, "25px 'cjkFonts 全瀨體', Comic Sans MS, Microsoft YaHei, sans-serif");
       wrapped.forEach((text) => {
         if (section.heading === languages.zh.note || section.heading === languages.us.note || section.heading === languages.uk.note) {
           ctx.fillStyle = palette.highlight;
           ctx.fillRect(75, y - 24, Math.min(ctx.measureText(text).width + 18, width - 150), 30);
         }
         ctx.fillStyle = palette.ink;
-        ctx.font = "25px Comic Sans MS, Microsoft YaHei, sans-serif";
+        ctx.font = "25px 'cjkFonts 全瀨體', Comic Sans MS, Microsoft YaHei, sans-serif";
         ctx.fillText(text, 82, y);
         y += 34;
       });
@@ -421,7 +475,7 @@ function createPatternCanvas(pattern) {
   });
 
   ctx.fillStyle = palette.muted;
-  ctx.font = "16px Comic Sans MS, Microsoft YaHei, sans-serif";
+  ctx.font = "16px 'cjkFonts 全瀨體', Comic Sans MS, Microsoft YaHei, sans-serif";
   ctx.fillText("© 2026 Puffy Kitty", 64, height - 44);
 
   return canvas;

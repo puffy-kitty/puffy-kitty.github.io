@@ -12,6 +12,16 @@ The site displays each crochet pattern on its own detail page, supports Chinese/
 - `assets/`: visual references and pattern preview images
 - `patterns/`: optional folder for future images or downloadable assets
 
+## Font
+
+The site uses `cjkFonts 全瀨體` through ZeoSeven Fonts:
+
+```css
+@import url("https://fontsapi.zeoseven.com/200/main/result.css");
+```
+
+ZeoSeven lists the font under OFL-1.1. The current implementation uses the hosted WebFont instead of committing the 30MB font file into this repository.
+
 ## GitHub Pages
 
 This repository is named `puffy-kitty.github.io`, so the site URL is:
