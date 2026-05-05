@@ -3,19 +3,23 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>钩针图解收藏</title>
+    <title>Puffy Kitty Crochet Patterns</title>
     <meta
       name="description"
-      content="发布和整理原创钩针图解、成品照片、材料清单与下载说明。"
+      content="Puffy Kitty 的原创钩针图解发布页，可在线阅读并下载图片或 PDF。"
     />
     <link rel="stylesheet" href="styles.css" />
+    <script src="scripts.js" defer></script>
   </head>
   <body>
     <header class="site-header">
-      <div>
-        <p class="eyebrow">Crochet Pattern Library</p>
-        <h1>钩针图解收藏</h1>
-      </div>
+      <a class="brand" href="#top" aria-label="Puffy Kitty 首页">
+        <span class="brand-mark">PK</span>
+        <span>
+          <span class="brand-name">Puffy Kitty</span>
+          <span class="brand-subtitle">Crochet Patterns</span>
+        </span>
+      </a>
       <nav aria-label="主导航">
         <a href="#patterns">图解</a>
         <a href="#about">说明</a>
@@ -23,19 +27,19 @@
       </nav>
     </header>
 
-    <main>
+    <main id="top">
       <section class="hero" aria-labelledby="hero-title">
         <div class="hero-copy">
-          <p class="eyebrow">原创设计发布页</p>
-          <h2 id="hero-title">把图解、材料和成品照片放在一个清楚好找的网站里。</h2>
+          <p class="eyebrow">原创钩针图解</p>
+          <h1 id="hero-title">在线阅读图解，也可以一键生成图片或 PDF。</h1>
           <p>
-            这里可以发布你的钩针图解、难度、线材、钩针尺寸和购买或下载方式。
-            上传到 GitHub 后，用 GitHub Pages 免费托管。
+            每张图解以卡片方式展示，正文直接放在网页里。下载按钮会根据当前图解现场生成文件，
+            不需要提前维护单独的 PDF。
           </p>
           <a class="button" href="#patterns">查看图解</a>
         </div>
-        <div class="hero-panel" aria-hidden="true">
-          <div class="stitch-grid">
+        <div class="hero-panel" aria-label="钩针针目装饰图">
+          <div class="stitch-grid" aria-hidden="true">
             <span></span><span></span><span></span><span></span>
             <span></span><span></span><span></span><span></span>
             <span></span><span></span><span></span><span></span>
@@ -45,38 +49,68 @@
 
       <section id="patterns" class="section" aria-labelledby="patterns-title">
         <div class="section-heading">
-          <p class="eyebrow">Patterns</p>
-          <h2 id="patterns-title">最新图解</h2>
+          <p class="eyebrow">Pattern Library</p>
+          <h2 id="patterns-title">图解列表</h2>
         </div>
 
         <div class="pattern-grid">
-          <article class="pattern-card">
-            <div class="pattern-preview motif-a" aria-hidden="true"></div>
-            <div class="pattern-body">
-              <p class="tag">入门</p>
-              <h3>花朵杯垫</h3>
-              <p>适合练习短针、长针和简单换色。建议使用棉线与 3.0 mm 钩针。</p>
-              <a href="patterns/flower-coaster.pdf">下载 PDF</a>
+          <article class="pattern-card pattern-card-featured" data-pattern-card="main-body">
+            <div class="pattern-preview crochet-preview" aria-hidden="true">
+              <span class="preview-loop loop-one"></span>
+              <span class="preview-loop loop-two"></span>
+              <span class="preview-loop loop-three"></span>
+              <span class="preview-hook"></span>
             </div>
-          </article>
 
-          <article class="pattern-card">
-            <div class="pattern-preview motif-b" aria-hidden="true"></div>
             <div class="pattern-body">
-              <p class="tag">中级</p>
-              <h3>小熊挂件</h3>
-              <p>包含主体、耳朵、鼻口部和挂绳说明。适合做钥匙扣或包挂。</p>
-              <a href="patterns/bear-charm.pdf">下载 PDF</a>
-            </div>
-          </article>
+              <div class="pattern-meta">
+                <span class="tag">主体</span>
+                <span>文字图解</span>
+              </div>
+              <h3>主体与头发</h3>
+              <p>
+                第一版示例图解。网页内展示完整内容，下载图片或 PDF 时会自动生成排版好的文件。
+              </p>
 
-          <article class="pattern-card">
-            <div class="pattern-preview motif-c" aria-hidden="true"></div>
-            <div class="pattern-body">
-              <p class="tag">进阶</p>
-              <h3>复古方格包</h3>
-              <p>由多个祖母方格拼接而成，页面可放置拼接图和配色表。</p>
-              <a href="patterns/granny-bag.pdf">下载 PDF</a>
+              <div class="pattern-sheet" data-pattern-sheet="main-body">
+                <div class="sheet-header">
+                  <p>Puffy Kitty Pattern</p>
+                  <h4>主体与头发</h4>
+                </div>
+
+                <section class="sheet-section">
+                  <h5>主体</h5>
+                  <ol class="round-list">
+                    <li><span>R1</span><strong>4x</strong></li>
+                    <li><span>R2</span><strong>4v</strong></li>
+                    <li><span>R3</span><strong>2(3x, v)</strong></li>
+                    <li><span>R4</span><strong>2(2x, v, 2x)</strong></li>
+                    <li><span>R5</span><strong>3(3x, v)</strong></li>
+                    <li><span>R6</span><strong>3(2x, v, 2x)</strong></li>
+                    <li><span>R7</span><strong>6(x, v, x)</strong></li>
+                    <li><span>R8</span><strong>8x, 8x, 8x</strong></li>
+                    <li><span>R9-10</span><strong>10x, 4x, 10x</strong></li>
+                    <li><span>R11</span><strong>9x, 6x, 9x</strong></li>
+                    <li><span>R12</span><strong>4a, 4a, 4a</strong></li>
+                  </ol>
+                  <p class="sheet-note">R12 根据带线方式调整，不漏白线就行。</p>
+                </section>
+
+                <section class="sheet-section">
+                  <h5>头发</h5>
+                  <p class="instruction-line">10ch，倒 2 回钩 9T，第一个 T 钩无痕起立。</p>
+                </section>
+
+                <section class="sheet-section abbreviations">
+                  <h5>缩写</h5>
+                  <p>x = 短针，v = 加针，a = 减针，ch = 锁针，T = 中长针或你常用定义。</p>
+                </section>
+              </div>
+
+              <div class="download-actions">
+                <button type="button" data-download-image="main-body">下载图片</button>
+                <button type="button" data-download-pdf="main-body">下载 PDF</button>
+              </div>
             </div>
           </article>
         </div>
@@ -84,13 +118,13 @@
 
       <section id="about" class="section split" aria-labelledby="about-title">
         <div>
-          <p class="eyebrow">About</p>
-          <h2 id="about-title">如何替换成你的内容</h2>
+          <p class="eyebrow">Workflow</p>
+          <h2 id="about-title">后续添加图解的方式</h2>
         </div>
         <div class="notes">
-          <p>把你的 PDF 图解放进 <code>patterns</code> 文件夹。</p>
-          <p>把卡片里的标题、难度、材料和下载链接改成对应文件名。</p>
-          <p>如果你有成品照片，可以把 <code>pattern-preview</code> 区域改成图片。</p>
+          <p>新增图解时复制一张卡片，改标题、说明和图解正文。</p>
+          <p>下载按钮会读取同一张卡片的数据，自动生成 PNG 和 PDF。</p>
+          <p>如果以后要做更复杂的符号图，可以在同一张卡片里加入 SVG 或 Canvas 图。</p>
         </div>
       </section>
 
@@ -102,7 +136,7 @@
     </main>
 
     <footer>
-      <p>© 2026 钩针图解收藏。所有图解版权归设计者所有。</p>
+      <p>© 2026 Puffy Kitty。网站代码可开源，原创图解版权归设计者所有。</p>
     </footer>
   </body>
 </html>
