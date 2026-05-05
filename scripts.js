@@ -43,6 +43,7 @@ const languages = {
 const patternData = {
   "main-body": {
     fileName: "puffy-kitty-main-body",
+    image: "assets/larvitar-pattern-2.jpeg",
     category: "主体",
     title: {
       zh: "主体与头发",
@@ -86,12 +87,13 @@ const patternData = {
 };
 
 const palette = {
-  paper: "#fffdf9",
-  ink: "#27221d",
+  paper: "#eaf8fb",
+  ink: "#111111",
   muted: "#6f665d",
-  line: "#ddd6cc",
-  rose: "#b65f72",
-  sage: "#6f8467"
+  line: "#cfe8ef",
+  rose: "#e53622",
+  sage: "#4e8cc7",
+  highlight: "rgba(236, 247, 92, 0.72)"
 };
 
 const app = document.querySelector("#app");
@@ -169,12 +171,7 @@ function renderPatternList() {
       return `
         <article class="pattern-card list-card">
           <a class="card-link" href="#/patterns/${id}">
-            <div class="pattern-preview crochet-preview" aria-hidden="true">
-              <span class="preview-loop loop-one"></span>
-              <span class="preview-loop loop-two"></span>
-              <span class="preview-loop loop-three"></span>
-              <span class="preview-hook"></span>
-            </div>
+            ${renderPreview(pattern, "pattern-preview")}
             <div class="pattern-body">
               <div class="pattern-meta">
                 <span class="tag">${pattern.category}</span>
@@ -199,6 +196,28 @@ function renderPatternList() {
   `;
 }
 
+function renderPreview(pattern, className) {
+  if (pattern.image) {
+    return `
+      <div class="${className} photo-preview" aria-hidden="true">
+        <img src="${pattern.image}" alt="" />
+        <span class="preview-spark spark-one"></span>
+        <span class="preview-spark spark-two"></span>
+        <span class="preview-spark spark-three"></span>
+      </div>
+    `;
+  }
+
+  return `
+    <div class="${className} crochet-preview" aria-hidden="true">
+      <span class="preview-loop loop-one"></span>
+      <span class="preview-loop loop-two"></span>
+      <span class="preview-loop loop-three"></span>
+      <span class="preview-hook"></span>
+    </div>
+  `;
+}
+
 function renderPatternDetail(pattern, id) {
   const term = languages[selectedLanguage];
 
@@ -206,12 +225,7 @@ function renderPatternDetail(pattern, id) {
     <a class="back-link" href="#/">${term.back}</a>
     <article class="detail-layout">
       <aside class="detail-aside">
-        <div class="pattern-preview crochet-preview compact-preview" aria-hidden="true">
-          <span class="preview-loop loop-one"></span>
-          <span class="preview-loop loop-two"></span>
-          <span class="preview-loop loop-three"></span>
-          <span class="preview-hook"></span>
-        </div>
+        ${renderPreview(pattern, "pattern-preview compact-preview")}
         <div class="language-panel">
           <p class="eyebrow">Terms</p>
           <div class="language-toggle" role="group" aria-label="切换钩针语言">
@@ -366,12 +380,12 @@ function createPatternCanvas(pattern) {
 
   let y = 70;
   ctx.fillStyle = palette.rose;
-  ctx.font = "700 18px Arial, Microsoft YaHei, sans-serif";
+  ctx.font = "700 18px Comic Sans MS, Microsoft YaHei, sans-serif";
   ctx.fillText(pattern.subtitle, 64, y);
 
   y += 52;
   ctx.fillStyle = palette.ink;
-  ctx.font = "700 44px Arial, Microsoft YaHei, sans-serif";
+  ctx.font = "700 48px Comic Sans MS, Microsoft YaHei, sans-serif";
   ctx.fillText(pattern.title, 64, y);
 
   y += 38;
@@ -385,15 +399,19 @@ function createPatternCanvas(pattern) {
   y += 54;
   pattern.sections.forEach((section) => {
     ctx.fillStyle = palette.sage;
-    ctx.font = "700 24px Arial, Microsoft YaHei, sans-serif";
+    ctx.font = "700 26px Comic Sans MS, Microsoft YaHei, sans-serif";
     ctx.fillText(section.heading, 64, y);
     y += 34;
 
     section.lines.forEach((line) => {
-      const wrapped = wrapText(ctx, line, width - 128, "22px Arial, Microsoft YaHei, sans-serif");
+      const wrapped = wrapText(ctx, line, width - 128, "25px Comic Sans MS, Microsoft YaHei, sans-serif");
       wrapped.forEach((text) => {
+        if (section.heading === languages.zh.note || section.heading === languages.us.note || section.heading === languages.uk.note) {
+          ctx.fillStyle = palette.highlight;
+          ctx.fillRect(75, y - 24, Math.min(ctx.measureText(text).width + 18, width - 150), 30);
+        }
         ctx.fillStyle = palette.ink;
-        ctx.font = "22px Arial, Microsoft YaHei, sans-serif";
+        ctx.font = "25px Comic Sans MS, Microsoft YaHei, sans-serif";
         ctx.fillText(text, 82, y);
         y += 34;
       });
@@ -403,7 +421,7 @@ function createPatternCanvas(pattern) {
   });
 
   ctx.fillStyle = palette.muted;
-  ctx.font = "16px Arial, Microsoft YaHei, sans-serif";
+  ctx.font = "16px Comic Sans MS, Microsoft YaHei, sans-serif";
   ctx.fillText("© 2026 Puffy Kitty", 64, height - 44);
 
   return canvas;
