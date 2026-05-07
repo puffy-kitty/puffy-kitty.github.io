@@ -40,72 +40,6 @@ const languages = {
   }
 };
 
-const patternData = {
-  "main-body": {
-    fileName: "puffy-kitty-main-body",
-    image: "assets/larvitar-pattern-2.jpeg",
-    images: ["assets/larvitar-pattern-2.jpeg", "assets/larvitar-pattern-1.jpeg"],
-    category: "主体",
-    title: {
-      zh: "主体与头发",
-      us: "Body and Hair",
-      uk: "Body and Hair"
-    },
-    summary: {
-      zh: "第一版示例图解。适合先确定网页展示、语言切换和下载生成方式。",
-      us: "First sample pattern for testing page layout, term switching, and generated downloads.",
-      uk: "First sample pattern for testing page layout, term switching, and generated downloads."
-    },
-    rows: [
-      { round: "R1", zh: "4x", us: "4 sc", uk: "4 dc" },
-      { round: "R2", zh: "4v", us: "4 inc", uk: "4 inc" },
-      { round: "R3", zh: "2(3x, v)", us: "2(3 sc, inc)", uk: "2(3 dc, inc)" },
-      { round: "R4", zh: "2(2x, v, 2x)", us: "2(2 sc, inc, 2 sc)", uk: "2(2 dc, inc, 2 dc)" },
-      { round: "R5", zh: "3(3x, v)", us: "3(3 sc, inc)", uk: "3(3 dc, inc)" },
-      { round: "R6", zh: "3(2x, v, 2x)", us: "3(2 sc, inc, 2 sc)", uk: "3(2 dc, inc, 2 dc)" },
-      { round: "R7", zh: "6(x, v, x)", us: "6(sc, inc, sc)", uk: "6(dc, inc, dc)" },
-      { round: "R8", zh: "8x, 8x, 8x", us: "8 sc, 8 sc, 8 sc", uk: "8 dc, 8 dc, 8 dc" },
-      { round: "R9-10", zh: "10x, 4x, 10x", us: "10 sc, 4 sc, 10 sc", uk: "10 dc, 4 dc, 10 dc" },
-      { round: "R11", zh: "9x, 6x, 9x", us: "9 sc, 6 sc, 9 sc", uk: "9 dc, 6 dc, 9 dc" },
-      { round: "R12", zh: "4a, 4a, 4a", us: "4 dec, 4 dec, 4 dec", uk: "4 dec, 4 dec, 4 dec" }
-    ],
-    notes: {
-      zh: ["R12 根据带线方式调整，不漏白线就行。"],
-      us: ["Adjust R12 depending on how you carry the yarn. The white strand should not show."],
-      uk: ["Adjust R12 depending on how you carry the yarn. The white strand should not show."]
-    },
-    hair: {
-      zh: ["10ch，倒 2 回钩 9T，第一个 T 钩无痕起立。"],
-      us: ["Ch 10, start in the 2nd chain from hook and work 9 hdc. Use an invisible standing hdc for the first hdc."],
-      uk: ["Ch 10, start in the 2nd chain from hook and work 9 htr. Use an invisible standing htr for the first htr."]
-    },
-    abbreviations: {
-      zh: ["x = 短针，v = 加针，a = 减针，ch = 锁针，T = 中长针。"],
-      us: ["sc = single crochet, inc = increase, dec = decrease, ch = chain, hdc = half double crochet."],
-      uk: ["dc = double crochet, inc = increase, dec = decrease, ch = chain, htr = half treble crochet."]
-    }
-  }
-};
-
-const seriesData = [
-  {
-    id: "pattern",
-    eyebrow: "Pattern",
-    title: "钩针软糖图解",
-    description: "原创玩偶和小物的文字图解档案。每份图解都有独立页面、图片和多语言记号。",
-    image: "assets/larvitar-pattern-2.jpeg",
-    href: "#/pattern"
-  },
-  {
-    id: "gallery",
-    eyebrow: "Gallery",
-    title: "OC 定制展示",
-    description: "角色定制、成品照片和灵感记录。这里更像作品集，不是商品列表。",
-    image: "assets/larvitar-pattern-1.jpeg",
-    href: "#/gallery"
-  }
-];
-
 const palette = {
   paper: "#eaf8fb",
   ink: "#111111",
@@ -118,10 +52,131 @@ const palette = {
 
 const app = document.querySelector("#app");
 let selectedLanguage = localStorage.getItem("patternLanguage") || "zh";
+let patternData = {};
+let patternList = [];
 
 window.addEventListener("hashchange", render);
 document.addEventListener("click", handleClick);
-render();
+init();
+
+async function init() {
+  app.innerHTML = renderLoading();
+
+  try {
+    await loadPatterns();
+    render();
+  } catch (error) {
+    app.innerHTML = renderLoadError(error);
+  }
+}
+
+async function loadPatterns() {
+  const folders = await fetchJson("patterns.json");
+  const patterns = await Promise.all(folders.map((folder) => loadPattern(folder)));
+  patternList = patterns;
+  patternData = Object.fromEntries(patterns.map((pattern) => [pattern.id, pattern]));
+}
+
+async function loadPattern(folder) {
+  const markdown = await fetchText(`${folder}/pattern.MD`);
+  return parsePatternMarkdown(markdown, folder);
+}
+
+async function fetchJson(path) {
+  const response = await fetch(path);
+
+  if (!response.ok) {
+    throw new Error(`Cannot load ${path}`);
+  }
+
+  return response.json();
+}
+
+async function fetchText(path) {
+  const response = await fetch(path);
+
+  if (!response.ok) {
+    throw new Error(`Cannot load ${path}`);
+  }
+
+  return response.text();
+}
+
+function parsePatternMarkdown(markdown, folder) {
+  const match = markdown.match(/^---\s*([\s\S]*?)\s*---\s*([\s\S]*)$/);
+
+  if (!match) {
+    throw new Error(`${folder}/pattern.MD is missing JSON front matter`);
+  }
+
+  const meta = JSON.parse(match[1]);
+  const body = match[2];
+  const cover = meta.cover ? `${folder}/${meta.cover}` : "";
+  const extraImages = (meta.images || []).map((image) => `${folder}/${image}`);
+
+  return {
+    id: meta.id || folder,
+    folder,
+    fileName: meta.fileName || folder,
+    image: cover,
+    images: [cover, ...extraImages].filter(Boolean),
+    category: meta.category,
+    tags: meta.tags || [],
+    title: meta.title,
+    summary: meta.summary,
+    rows: parseBodyRows(body),
+    notes: parseLocalizedList(body, "notes"),
+    hair: parseLocalizedList(body, "hair"),
+    abbreviations: parseLocalizedList(body, "abbreviations")
+  };
+}
+
+function parseBodyRows(markdown) {
+  const section = getSection(markdown, "body");
+
+  return section
+    .split("\n")
+    .map((line) => line.trim())
+    .filter((line) => line.startsWith("|") && !line.includes("---"))
+    .slice(1)
+    .map((line) => {
+      const cells = line
+        .split("|")
+        .slice(1, -1)
+        .map((cell) => cell.trim());
+
+      return {
+        round: cells[0],
+        zh: cells[1],
+        us: cells[2],
+        uk: cells[3]
+      };
+    });
+}
+
+function parseLocalizedList(markdown, sectionName) {
+  const section = getSection(markdown, sectionName);
+
+  return Object.fromEntries(
+    Object.keys(languages).map((language) => {
+      const match = section.match(new RegExp(`###\\s+${language}\\s*([\\s\\S]*?)(?=\\n###\\s+|$)`));
+      const items = match
+        ? match[1]
+            .split("\n")
+            .map((line) => line.trim())
+            .filter((line) => line.startsWith("- "))
+            .map((line) => line.slice(2).trim())
+        : [];
+
+      return [language, items];
+    })
+  );
+}
+
+function getSection(markdown, name) {
+  const match = markdown.match(new RegExp(`##\\s+${name}\\s*([\\s\\S]*?)(?=\\n##\\s+|$)`));
+  return match ? match[1].trim() : "";
+}
 
 async function handleClick(event) {
   const languageButton = event.target.closest("[data-language]");
@@ -181,7 +236,7 @@ function getRoute() {
   const parts = hash.replace(/^#\/?/, "").split("/").filter(Boolean);
 
   if (parts[0] === "pattern" && parts[1]) {
-    return { type: "pattern", id: parts[1] };
+    return { type: "pattern", id: parts.slice(1).join("/") };
   }
 
   if (parts[0] === "pattern") {
@@ -203,7 +258,52 @@ function getRoute() {
   return { type: "list" };
 }
 
+function renderLoading() {
+  return `
+    <section class="section">
+      <p class="eyebrow">Loading</p>
+      <h2>正在读取图解文件</h2>
+    </section>
+  `;
+}
+
+function renderLoadError(error) {
+  const isLocalFile = window.location.protocol === "file:";
+
+  return `
+    <section class="section">
+      <p class="eyebrow">Pattern Error</p>
+      <h2>图解文件读取失败</h2>
+      <p>${escapeHtml(error.message)}</p>
+      ${
+        isLocalFile
+          ? `<p>当前页面是用 <code>file://</code> 打开的。这个版本需要用本地服务器打开，才能读取 <code>patterns.json</code> 和每个图解文件夹里的 <code>pattern.MD</code>。</p>
+             <p>在仓库目录运行 <code>node serve-local.js</code>，然后打开 <code>http://127.0.0.1:4173/</code>。</p>`
+          : `<p>请确认 <code>patterns.json</code> 中登记的文件夹存在，并且每个文件夹内都有 <code>pattern.MD</code>。</p>`
+      }
+    </section>
+  `;
+}
+
 function renderHome() {
+  const featuredPattern = patternList[0];
+  const seriesData = [
+    {
+      eyebrow: "Pattern",
+      title: "钩针软糖图解",
+      description: "原创玩偶和小物的文字图解档案。每份图解都有独立文件夹、图片和多语言记号。",
+      image: featuredPattern ? featuredPattern.image : "assets/larvitar-pattern-2.jpeg",
+      href: "#/pattern"
+    },
+    {
+      eyebrow: "Gallery",
+      title: "OC 定制展示",
+      description: "角色定制、成品照片和灵感记录。这里更像作品集，不是商品列表。",
+      image: featuredPattern?.images[1] || "assets/larvitar-pattern-1.jpeg",
+      href: "#/gallery"
+    }
+  ];
+
   const rows = seriesData
     .map((series) => {
       return `
@@ -222,7 +322,7 @@ function renderHome() {
   return `
     <section class="home-hero">
       <div class="home-portrait">
-        <img src="assets/larvitar-pattern-1.jpeg" alt="" />
+        <img src="${featuredPattern ? featuredPattern.image : "assets/larvitar-pattern-1.jpeg"}" alt="" />
         <span class="portrait-doodle heart">♥</span>
         <span class="portrait-doodle face">^^</span>
       </div>
@@ -242,19 +342,19 @@ function renderHome() {
 }
 
 function renderPatternIndex() {
-  const cards = Object.entries(patternData)
-    .map(([id, pattern]) => {
+  const cards = patternList
+    .map((pattern) => {
       return `
         <article class="pattern-card list-card">
-          <a class="card-link" href="#/pattern/${id}">
+          <a class="card-link" href="#/pattern/${pattern.id}">
             ${renderPreview(pattern, "pattern-preview")}
             <div class="pattern-body">
               <div class="pattern-meta">
-                <span class="tag">${pattern.category}</span>
+                ${renderPatternTags(pattern)}
                 <span>${languages[selectedLanguage].chartType}</span>
               </div>
-              <h2>${pattern.title[selectedLanguage]}</h2>
-              <p>${pattern.summary[selectedLanguage]}</p>
+              <h2>${getLocalized(pattern.title)}</h2>
+              <p>${getLocalized(pattern.summary)}</p>
               <span class="text-link">${languages[selectedLanguage].view}</span>
             </div>
           </a>
@@ -297,6 +397,14 @@ function renderPreview(pattern, className) {
   `;
 }
 
+function renderPatternTags(pattern) {
+  const tags = [pattern.category, ...(pattern.tags || [])]
+    .map((tag) => getLocalized(tag))
+    .filter(Boolean);
+
+  return tags.map((tag) => `<span class="tag">${escapeHtml(tag)}</span>`).join("");
+}
+
 function renderPatternDetail(pattern, id) {
   const term = languages[selectedLanguage];
 
@@ -322,11 +430,11 @@ function renderPatternDetail(pattern, id) {
 
       <section class="pattern-detail">
         <div class="pattern-meta">
-          <span class="tag">${pattern.category}</span>
+          ${renderPatternTags(pattern)}
           <span>${term.chartType}</span>
         </div>
-        <h2>${pattern.title[selectedLanguage]}</h2>
-        <p>${pattern.summary[selectedLanguage]}</p>
+        <h2>${getLocalized(pattern.title)}</h2>
+        <p>${getLocalized(pattern.summary)}</p>
 
         ${renderPatternSheet(pattern, selectedLanguage)}
 
@@ -341,19 +449,18 @@ function renderPatternDetail(pattern, id) {
 }
 
 function renderImageCarousel(pattern) {
-  const images = pattern.images || [pattern.image].filter(Boolean);
-  const slides = images
+  const slides = pattern.images
     .map((image, index) => {
       return `
         <figure class="carousel-slide">
-          <img src="${image}" alt="${pattern.title[selectedLanguage]} 图片 ${index + 1}" />
+          <img src="${image}" alt="${getLocalized(pattern.title)} 图片 ${index + 1}" />
         </figure>
       `;
     })
     .join("");
 
   return `
-    <div class="detail-gallery" aria-label="${pattern.title[selectedLanguage]} 图片">
+    <div class="detail-gallery" aria-label="${getLocalized(pattern.title)} 图片">
       <div class="image-carousel">${slides}</div>
       <div class="carousel-hint">← swipe →</div>
     </div>
@@ -363,14 +470,14 @@ function renderImageCarousel(pattern) {
 function renderPatternSheet(pattern, language) {
   const term = languages[language];
   const rows = pattern.rows
-    .map((row) => `<li><span>${row.round}</span><strong>${row[language]}</strong></li>`)
+    .map((row) => `<li><span>${escapeHtml(row.round)}</span><strong>${escapeHtml(row[language])}</strong></li>`)
     .join("");
 
   return `
     <div class="pattern-sheet">
       <div class="sheet-header">
         <p>Puffy Kitty Pattern · ${term.fullName}</p>
-        <h3>${pattern.title[language]}</h3>
+        <h3>${getLocalized(pattern.title)}</h3>
       </div>
 
       <section class="sheet-section">
@@ -380,20 +487,24 @@ function renderPatternSheet(pattern, language) {
 
       <section class="sheet-section">
         <h4>${term.note}</h4>
-        ${pattern.notes[language].map((line) => `<p>${line}</p>`).join("")}
+        ${renderLines(pattern.notes[language])}
       </section>
 
       <section class="sheet-section">
         <h4>${term.hair}</h4>
-        ${pattern.hair[language].map((line) => `<p>${line}</p>`).join("")}
+        ${renderLines(pattern.hair[language])}
       </section>
 
       <section class="sheet-section abbreviations">
         <h4>${term.abbreviations}</h4>
-        ${pattern.abbreviations[language].map((line) => `<p>${line}</p>`).join("")}
+        ${renderLines(pattern.abbreviations[language])}
       </section>
     </div>
   `;
+}
+
+function renderLines(lines) {
+  return lines.map((line) => `<p>${escapeHtml(line)}</p>`).join("");
 }
 
 function renderAbout() {
@@ -405,9 +516,9 @@ function renderAbout() {
         <h2>后续添加图解的方式</h2>
       </div>
       <div class="notes">
-        <p>首页只展示图解卡片，完整内容放在单独详情页。</p>
-        <p>每个图解在 <code>scripts.js</code> 里维护中文、US、UK 三套文字。</p>
-        <p>下载图片和 PDF 会使用当前切换的语言版本。</p>
+        <p>每个图解放在多层归档文件夹中，例如 <code>patterns/gummy/pokemon/ralts/</code>。</p>
+        <p>图解文字维护在文件夹内的 <code>pattern.MD</code>，封面和过程图也放在同一个文件夹。</p>
+        <p><code>patterns.json</code> 只负责登记有哪些图解文件夹；下载图片和 PDF 会使用当前切换的语言版本。</p>
       </div>
     </div>
     </section>
@@ -415,6 +526,8 @@ function renderAbout() {
 }
 
 function renderGallery() {
+  const images = patternList.flatMap((pattern) => pattern.images);
+
   return `
     <section class="section">
     <a class="back-link" href="#/">返回主页</a>
@@ -423,8 +536,7 @@ function renderGallery() {
       <h2>OC 定制展示</h2>
     </div>
     <div class="gallery-grid">
-      <img src="assets/larvitar-pattern-2.jpeg" alt="拉鲁拉斯软糖图解旧稿 1" />
-      <img src="assets/larvitar-pattern-1.jpeg" alt="拉鲁拉斯软糖图解旧稿 2" />
+      ${images.map((image, index) => `<img src="${image}" alt="作品图片 ${index + 1}" />`).join("")}
     </div>
     </section>
   `;
@@ -447,7 +559,7 @@ function getPrintablePattern(pattern, language) {
 
   return {
     fileName: `${pattern.fileName}-${language}`,
-    title: pattern.title[language],
+    title: getLocalized(pattern.title, language),
     subtitle: `Puffy Kitty Pattern · ${term.fullName}`,
     sections: [
       {
@@ -647,6 +759,22 @@ function createPdfFromJpeg(jpegDataUrl, imageWidth, imageHeight) {
   }
 
   return new Blob([bytes], { type: "application/pdf" });
+}
+
+function getLocalized(value, language = selectedLanguage) {
+  if (!value || typeof value === "string") {
+    return value || "";
+  }
+
+  return value[language] || value.zh || value.us || value.uk || "";
+}
+
+function escapeHtml(value) {
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;");
 }
 
 function downloadDataUrl(dataUrl, fileName) {

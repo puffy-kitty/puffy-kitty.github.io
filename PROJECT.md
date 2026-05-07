@@ -28,7 +28,7 @@ The site should feel like a cute handmade pattern notebook rather than a commerc
   - Crochet candy pattern series gallery
   - Shows pattern entries as gallery cards
 
-- `#/pattern/main-body`
+- `#/pattern/patterns/gummy/pokemon/ralts`
   - Individual pattern reader page
   - Left side: fixed image carousel
   - Right side: scrollable pattern instructions
@@ -54,7 +54,8 @@ The site should feel like a cute handmade pattern notebook rather than a commerc
   - `styles.css`
   - `scripts.js`
   - `assets/`
-  - `patterns/`
+  - `patterns.json`
+  - pattern folders such as `patterns/gummy/pokemon/ralts/`
 
 ## Current GitHub Repository
 
@@ -74,14 +75,25 @@ Local branch currently contains unpublished commits ahead of GitHub.
 
 ## Pattern Data Model
 
-Pattern content currently lives in `scripts.js` inside `patternData`.
+Pattern content now lives in one folder per pattern. The current pattern is:
+
+```text
+patterns/gummy/pokemon/ralts/
+  pattern.MD
+  cover.JPEG
+  1.JPEG
+  2.JPEG
+  3.JPEG
+```
+
+`patterns.json` lists which pattern folders the static site should load.
 
 Each pattern can define:
 
 - `fileName`
-- `image`
 - `images`
 - `category`
+- `tags`
 - `title.zh / title.us / title.uk`
 - `summary.zh / summary.us / summary.uk`
 - `rows`
@@ -89,7 +101,7 @@ Each pattern can define:
 - `hair`
 - `abbreviations`
 
-The page renders from this data and generates downloads from the currently selected language.
+The page reads this data from the JSON front matter and Markdown sections in `pattern.MD`, then generates downloads from the currently selected language.
 
 ## Key Design Decisions
 
@@ -107,7 +119,7 @@ The page renders from this data and generates downloads from the currently selec
 - Replace placeholder `Puffy Kitty` logo with the final logo image or final brand text.
 - Confirm whether the brand name is `Puffy Kitty`, `猫团团`, or both.
 - Add real personal introduction copy for the homepage.
-- Add real pattern entries and images.
+- Add real pattern entries and images using one folder per pattern.
 - Decide whether to self-host `cjkFonts 全瀨體` instead of using ZeoSeven hosted WebFont.
 - Preview in browser across desktop and mobile.
 - Push local commits to GitHub after visual confirmation.
@@ -118,6 +130,12 @@ Check JavaScript syntax:
 
 ```powershell
 node --check scripts.js
+```
+
+Run a local preview:
+
+```powershell
+node serve-local.js
 ```
 
 Check git status:
