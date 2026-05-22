@@ -1,30 +1,37 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Puffy Kitty Crochet Patterns</title>
     <meta
       name="description"
-      content="Puffy Kitty 的原创钩针图解发布页，可在线阅读并下载图片或 PDF。"
+      content="Puffy Kitty crochet patterns, handmade gallery, and studio notes."
     />
-    <link rel="stylesheet" href="styles.css" />
-    <script src="scripts.js" defer></script>
+    <link rel="stylesheet" href="styles.css?v=header-logo-1" />
+    <script src="scripts.js?v=header-logo-1" defer></script>
   </head>
   <body>
     <header class="site-header">
-      <a class="brand" href="#/" aria-label="Puffy Kitty 首页">
-        <span class="brand-mark">PK</span>
+      <a class="brand" href="#/" aria-label="Puffy Kitty home">
+        <span class="brand-mark">
+          <img src="logo/CoverLogo.PNG" alt="" />
+        </span>
         <span>
           <span class="brand-name">Puffy Kitty</span>
-          <span class="brand-subtitle">Crochet Patterns</span>
+          <span class="brand-subtitle" data-i18n="brandSubtitle">Crochet</span>
         </span>
       </a>
-      <nav aria-label="主导航">
-        <a href="#/pattern">pattern</a>
-        <a href="#/gallery">gallery</a>
-        <a href="#/contact">contact</a>
-        <a href="#/about">about</a>
+      <div class="site-language-toggle" role="group" aria-label="Site language">
+        <button type="button" data-site-language="zh">中</button>
+        <button type="button" data-site-language="en">EN</button>
+      </div>
+      <nav aria-label="Main navigation">
+        <a href="#/" data-nav="home" data-i18n="nav.home">main</a>
+        <a href="#/pattern" data-nav="pattern" data-i18n="nav.pattern">pattern</a>
+        <a href="#/gallery" data-nav="gallery" data-i18n="nav.gallery">gallery</a>
+        <a href="#/contact" data-nav="contact" data-i18n="nav.contact">contact</a>
+        <a href="#/about" data-nav="about" data-i18n="nav.about">about</a>
       </nav>
     </header>
 
@@ -33,7 +40,7 @@
     </main>
 
     <footer>
-      <p>© 2026 Puffy Kitty。网站代码可开源，原创图解版权归设计者所有。</p>
+      <p data-i18n="footer">2026 Puffy Kitty. Original crochet patterns and studio archive.</p>
     </footer>
   </body>
 </html>

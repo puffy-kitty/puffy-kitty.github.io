@@ -91,6 +91,8 @@ patterns/gummy/pokemon/ralts/
 Each pattern can define:
 
 - `fileName`
+- `cover1` for the website card/detail cover image; default to `cover1.JPEG`
+- `cover2` for the image shown on downloaded PNG/PDF exports; default to `cover2.JPEG`
 - `images`
 - `category`
 - `tags`
@@ -100,6 +102,84 @@ Each pattern can define:
 - `notes`
 - `hair`
 - `abbreviations`
+
+Patterns with one version dimension use `versions` plus matching sections like
+`body:large`, `notes:large`, and `hair:large`.
+
+Patterns with independent version dimensions use `versionGroups`. The site
+builds every combination from the group options and reads matching sections
+whose suffix is the joined option ids, for example:
+
+```text
+versionGroups:
+  region: johto / paldea
+  body: half / one
+
+sections:
+  body:johto-half
+  body:johto-one
+  body:paldea-half
+  body:paldea-one
+```
+
+Put yarn color/material notes directly under the body section using
+`body-materials:<version-id>` instead of writing the color inside `R1`.
+
+Use `color-notes:<version-id>` for mid-pattern color changes. These notes render
+between the pattern title and body table. Inline `*text*` uses green highlight,
+and `**text**` uses orange highlight, for example `*换绿线*`.
+
+Named accessories use `accessories` metadata plus `assess:<name>:<version-id>`
+sections. For example:
+
+```text
+accessories:
+  antenna -> 触角 / Antenna
+
+sections:
+  assess:antenna:johto-half
+  assess:antenna:paldea-half
+```
+
+Tiny accessories should stay as plain localized bullets after their material
+line when they only have one or two crochet rounds/rows, or when they only need
+one or two short instructions. Do not force `R1` / `R2` labels unless the
+accessory has three or more meaningful rounds/rows or a genuinely long sequence.
+When writing turn-back instructions, always include the count: use `倒1回钩`,
+not `倒回钩`.
+
+When the user asks to add a new gummy Pokemon draft, create a lower-case English
+folder under `patterns/gummy/pokemon/` and add `draft.md`. For example, "增加一个
+皮卡丘软糖图解" means:
+
+```text
+patterns/gummy/pokemon/pikachu/draft.md
+```
+
+with this starting content:
+
+```markdown
+# 皮卡丘
+## 主体
+
+
+# note to ai
+```
+
+New pattern SOP:
+
+- `新建一个图解，类型是宝可梦软糖，名字是 xxx` creates
+  `patterns/gummy/pokemon/<english-slug>/draft.md`.
+- `新建一个图解，类型是动物软糖，名字是 xxx` creates
+  `patterns/gummy/animals/<english-slug>/draft.md`.
+- Ask a short clarification if the Chinese name or nickname cannot be mapped to
+  a confident English slug.
+- Draft creation does not add the folder to `patterns.json`.
+- Formal conversion creates `pattern.MD`, defaults to `cover1.JPEG` and
+  `cover2.JPEG`, adds localized metadata/tags/accessories, adds the folder to
+  `patterns.json`, and renames the source draft to `draft-done.md` or similar.
+- Pokemon gummy patterns use `Pokemon` and `gummy` tags. Animal gummy patterns
+  use `animal` and `gummy` tags.
 
 The page reads this data from the JSON front matter and Markdown sections in `pattern.MD`, then generates downloads from the currently selected language.
 

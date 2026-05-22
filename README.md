@@ -54,11 +54,12 @@ http://127.0.0.1:4173/
 ## Add A New Pattern
 
 1. Create a new folder under `patterns/` using layered archive paths, for example `patterns/gummy/pokemon/ralts/`.
-2. Put the pattern text in `pattern.MD`.
-3. Put the cover image and detail images in the same folder, for example `cover.JPEG`, `1.JPEG`, `2.JPEG`, `3.JPEG`.
-4. Add the folder path to `patterns.json`.
-5. The pattern series page and detail page are rendered automatically from the Markdown file.
-6. Download buttons use the current language selected by the visitor.
+2. Put rough working notes in `draft.md`. Draft files are ignored by Git and are not published.
+3. Convert the draft into the generated `pattern.MD` format before previewing or publishing.
+4. Put the cover image and detail images in the same folder, for example `cover.JPEG`, `1.JPEG`, `2.JPEG`, `3.JPEG`.
+5. Add the folder path to `patterns.json`.
+6. The pattern series page and detail page are rendered automatically from the Markdown file.
+7. Download buttons use the current language selected by the visitor.
 
 ```text
 patterns/gummy/pokemon/ralts/
