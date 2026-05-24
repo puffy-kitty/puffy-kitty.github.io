@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://puffy-kitty.github.io/sitemap.xml
