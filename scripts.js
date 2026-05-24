@@ -5,7 +5,7 @@ const languages = {
     body: "主体",
     hair: "头发",
     note: "备注",
-    abbreviations: "缩写",
+    abbreviations: "记号",
     downloadImage: "下载图片",
     downloadPdf: "下载 PDF",
     downloadMenu: "下载↓",
@@ -19,7 +19,7 @@ const languages = {
     body: "Body",
     hair: "Hair",
     note: "Note",
-    abbreviations: "Abbreviations",
+    abbreviations: "Notation",
     downloadImage: "Download PNG",
     downloadPdf: "Download PDF",
     downloadMenu: "Download ↓",
@@ -33,7 +33,7 @@ const languages = {
     body: "Body",
     hair: "Hair",
     note: "Note",
-    abbreviations: "Abbreviations",
+    abbreviations: "Notation",
     downloadImage: "Download PNG",
     downloadPdf: "Download PDF",
     downloadMenu: "Download ↓",
@@ -49,7 +49,7 @@ languages.zh = {
   body: "主体",
   hair: "配件",
   note: "备注",
-  abbreviations: "缩写",
+  abbreviations: "记号",
   downloadImage: "下载图片",
   downloadPdf: "下载 PDF",
   downloadMenu: "下载↓",
@@ -804,8 +804,6 @@ function renderPatternSheet(pattern, language, version = getActiveVersion(patter
           ${versionLabel ? `<span>${escapeHtml(versionLabel)}</span>` : ""}
         </div>
       </div>
-      ${colorNotes.length ? `<div class="sheet-color-notes">${renderLines(colorNotes)}</div>` : ""}
-
       <section class="sheet-section">
         ${renderSectionHeading(term.body, bodyMaterial.note, language)}
         ${renderLines(bodyMaterial.lines)}
@@ -821,7 +819,7 @@ function renderPatternSheet(pattern, language, version = getActiveVersion(patter
 
       <section class="sheet-section abbreviations">
         ${renderSectionHeading(term.abbreviations)}
-        ${renderLines(getAbbreviationLines(pattern, language))}
+        ${renderNotationLines(pattern, language, colorNotes)}
       </section>
     </div>
   `;
@@ -917,6 +915,20 @@ function extractMaterialNote(lines) {
   }
 
   return { note: "", lines };
+}
+
+function renderNotationLines(pattern, language, colorNotes = []) {
+  const abbreviationLines = getAbbreviationLines(pattern, language);
+  const colorNoteLabel = language === "zh" ? "高亮颜色换线：" : "Highlight color changes:";
+
+  return `
+    ${
+      colorNotes.length
+        ? `<div class="notation-color-line"><span>${escapeHtml(colorNoteLabel)}</span>${renderLines(colorNotes)}</div>`
+        : ""
+    }
+    ${renderLines(abbreviationLines)}
+  `;
 }
 
 function getAbbreviationLines(pattern, language) {
@@ -1265,15 +1277,15 @@ function getPrintablePattern(pattern, language, version = getActiveVersion(patte
     title: getLocalized(pattern.title, language),
     image: pattern.exportImage || pattern.seriesImage || pattern.image,
     watermark: "logo/watermark1.PNG",
-    colorNotes: version.colorNotes?.[language] || [],
+    colorNotes: [],
     subtitle:
       language === "zh"
         ? `猫团团图解 · ${term.fullName}${versionLabel}`
         : `Puffy Kitty Pattern · ${term.fullName}${versionLabel}`,
     noteLabel: language === "zh" ? "线材" : "Yarn",
     footerLines: [
-      "© 2026 猫团团。原创图解仅供个人手作使用，请勿转载、转售或声称为自己的作品。",
-      "© 2026 Puffy Kitty. Original pattern for personal handmade use only. Do not redistribute, resell, or claim as your own."
+      "猫团团钩针图解，仅供个人手作使用，请勿转载、转售或声称为自己的作品。",
+      "Puffy Kitty crochet pattern. For personal handmade use only. Do not redistribute, resell, or claim as your own."
     ],
     sections: [
       {
@@ -1290,6 +1302,8 @@ function getPrintablePattern(pattern, language, version = getActiveVersion(patte
     ],
     abbreviations: {
       heading: term.abbreviations,
+      language,
+      colorNotes: version.colorNotes?.[language] || [],
       lines: getExportAbbreviationLines(pattern.abbreviations[language])
     }
   };
@@ -1447,7 +1461,7 @@ function createLegacyPatternCanvas(pattern) {
 
   ctx.fillStyle = palette.muted;
   ctx.font = "16px 'cjkFonts 全瀨體', Comic Sans MS, Microsoft YaHei, sans-serif";
-  ctx.fillText("© 2026 Puffy Kitty", 64, height - 44);
+  ctx.fillText("Puffy Kitty crochet pattern. Do not redistribute, resell, or claim as your own.", 64, height - 44);
 
   return canvas;
 }
@@ -1554,13 +1568,13 @@ function createExportLayout(ctx, pattern, width, height) {
   const marginX = 64;
   const coverWidth = 744;
   const coverHeight = 360;
-  const watermarkWidth = 380;
-  const watermarkHeight = 258;
+  const watermarkWidth = 470;
+  const watermarkHeight = 319;
   const abbreviationBox = {
     x: marginX,
-    y: 1600,
+    y: 1548,
     width: width - marginX * 2 - watermarkWidth - 44,
-    height: 170
+    height: 222
   };
   const settings = {
     width,
@@ -1589,7 +1603,7 @@ function createExportLayout(ctx, pattern, width, height) {
     abbreviationLineHeight: 42,
     legendHeight: 50,
     noteHeight: 40,
-    rowRoundWidth: 126,
+    rowRoundWidth: 108,
     sectionGap: 34
   };
   const contentHeight = settings.contentBottom - settings.contentTop;
@@ -1807,7 +1821,7 @@ function drawExportItems(ctx, layout) {
 }
 
 function drawExportAbbreviations(ctx, layout) {
-  if (!layout.abbreviations?.lines?.length) {
+  if (!layout.abbreviations?.lines?.length && !layout.abbreviations?.colorNotes?.length) {
     return;
   }
 
@@ -1821,31 +1835,167 @@ function drawExportAbbreviations(ctx, layout) {
   drawRoundedRect(ctx, box.x, y + 8, headingWidth, 58, 5);
   ctx.fillStyle = palette.ink;
   ctx.fillText(layout.abbreviations.heading, box.x + 9, y + 58);
-  y += headingHeight;
+  y += headingHeight + 24;
+
+  if (layout.abbreviations.colorNotes?.length) {
+    const label = layout.abbreviations.language === "zh" ? "高亮颜色换线：" : "Highlight color changes:";
+    const labelWidth = drawExportNotationLabel(ctx, label, box.x + 12, y, layout);
+    const colorPills = buildExportNotationColorPills(ctx, layout.abbreviations.colorNotes, box.width - 34 - labelWidth, layout);
+    drawExportNotationColorPills(ctx, colorPills, box.x + 24 + labelWidth, y, layout);
+    y += Math.max(1, colorPills[colorPills.length - 1]?.line + 1 || 1) * 44 + 10;
+  }
 
   const availableWidth = box.width - 24;
   const maxRows = Math.max(1, Math.floor((box.y + box.height - y) / layout.abbreviationLineHeight));
   let fontSize = 38;
   let rows = [];
+  let bestRows = [];
+  let bestFontSize = fontSize;
 
   while (fontSize >= 24) {
     const font = layout.abbreviationFont.replace(/\d+px/, `${fontSize}px`);
-    rows = wrapExportInlineItems(ctx, layout.abbreviations.lines, availableWidth, font, Math.min(2, maxRows));
-    if (rows.length <= maxRows) {
+    const items = buildExportNotationItems(ctx, layout.abbreviations.lines || [], font);
+    rows = wrapExportNotationItems(items, availableWidth, 1);
+    if (!bestRows.length || rows.length < bestRows.length) {
+      bestRows = rows;
+      bestFontSize = fontSize;
+    }
+    if (rows.length <= 1) {
       ctx.font = font;
       break;
     }
     fontSize -= 2;
   }
 
+  if (rows.length > 1) {
+    rows = bestRows;
+    fontSize = bestFontSize;
+    ctx.font = layout.abbreviationFont.replace(/\d+px/, `${fontSize}px`);
+  }
+
   rows.slice(0, maxRows).forEach((row, rowIndex) => {
     let x = box.x + 12;
     row.forEach((item) => {
-      ctx.fillStyle = palette.ink;
-      ctx.fillText(item.text, x, y + rowIndex * layout.abbreviationLineHeight + fontSize);
-      x += item.width + 34;
+      drawExportNotationItem(ctx, item, x, y + rowIndex * layout.abbreviationLineHeight, fontSize);
+      x += item.width + 30;
     });
   });
+}
+
+function drawExportNotationLabel(ctx, label, x, y, layout) {
+  ctx.font = layout.abbreviationFont;
+  ctx.fillStyle = palette.muted;
+  ctx.fillText(label, x, y + 32);
+  return ctx.measureText(label).width;
+}
+
+function buildExportNotationColorPills(ctx, lines, maxWidth, layout) {
+  ctx.font = layout.abbreviationFont;
+  const gap = 18;
+  let x = 0;
+  let line = 0;
+
+  return lines.map((value) => {
+    const segments = tokenizeInlinePatternText(value);
+    const text = segments.map((segment) => segment.text).join("");
+    const width = ctx.measureText(text).width + 24;
+
+    if (x && x + width > maxWidth) {
+      x = 0;
+      line += 1;
+    }
+
+    const pill = {
+      text,
+      highlight: segments.find((segment) => segment.highlight)?.highlight || "",
+      x,
+      line,
+      width
+    };
+    x += width + gap;
+    return pill;
+  });
+}
+
+function drawExportNotationColorPills(ctx, pills, x, y, layout) {
+  ctx.font = layout.abbreviationFont;
+  pills.forEach((pill) => {
+    const pillX = x + pill.x;
+    const pillY = y + pill.line * 44;
+    ctx.fillStyle = getExportHighlightColor(pill.highlight);
+    drawRoundedRect(ctx, pillX, pillY, pill.width, 38, 7);
+    if (pill.highlight === "three") {
+      ctx.strokeStyle = "rgba(83, 112, 122, 0.26)";
+      ctx.lineWidth = 1;
+      strokeRoundedRect(ctx, pillX, pillY, pill.width, 38, 7);
+    }
+    ctx.fillStyle = palette.ink;
+    ctx.fillText(pill.text, pillX + 12, pillY + 32);
+  });
+}
+
+function buildExportNotationItems(ctx, lines, font) {
+  ctx.font = font;
+  return lines.map((line) => ({
+    text: line,
+    highlight: "",
+    width: ctx.measureText(line).width
+  }));
+}
+
+function wrapExportNotationItems(items, maxWidth, preferredRows = 1) {
+  if (preferredRows === 2 && items.length > 2) {
+    let bestRows = null;
+    let bestScore = Infinity;
+
+    for (let split = 1; split < items.length; split += 1) {
+      const first = items.slice(0, split);
+      const second = items.slice(split);
+      const firstWidth = getExportInlineRowWidth(first);
+      const secondWidth = getExportInlineRowWidth(second);
+
+      if (firstWidth <= maxWidth && secondWidth <= maxWidth) {
+        const score = Math.abs(firstWidth - secondWidth);
+        if (score < bestScore) {
+          bestScore = score;
+          bestRows = [first, second];
+        }
+      }
+    }
+
+    if (bestRows) {
+      return bestRows;
+    }
+  }
+
+  const rows = [[]];
+  let x = 0;
+
+  items.forEach((item) => {
+    if (x && x + item.width > maxWidth) {
+      rows.push([]);
+      x = 0;
+    }
+    rows[rows.length - 1].push(item);
+    x += item.width + 30;
+  });
+
+  return rows;
+}
+
+function drawExportNotationItem(ctx, item, x, y, fontSize) {
+  if (item.highlight) {
+    ctx.fillStyle = getExportHighlightColor(item.highlight);
+    drawRoundedRect(ctx, x - 5, y + 3, item.width, 38, 7);
+    if (item.highlight === "three") {
+      ctx.strokeStyle = "rgba(83, 112, 122, 0.26)";
+      ctx.lineWidth = 1;
+      strokeRoundedRect(ctx, x - 5, y + 3, item.width, 38, 7);
+    }
+  }
+
+  ctx.fillStyle = palette.ink;
+  ctx.fillText(item.text, x + (item.highlight ? 6 : 0), y + fontSize);
 }
 
 function wrapExportInlineItems(ctx, lines, maxWidth, font, preferredRows = 1) {
@@ -1950,7 +2100,127 @@ function wrapRichInlineText(ctx, value, maxWidth, font) {
     lines.push(line);
   }
 
-  return lines.length ? lines : [[{ text: "", highlight: "" }]];
+  return balanceShortFinalExportLine(ctx, lines.length ? lines : [[{ text: "", highlight: "" }]], maxWidth);
+}
+
+function balanceShortFinalExportLine(ctx, lines, maxWidth) {
+  if (lines.length < 2) {
+    return lines;
+  }
+
+  const lastLine = lines[lines.length - 1];
+  const previousLine = lines[lines.length - 2];
+  const lastText = getExportSegmentsText(lastLine).trim();
+  const previousText = getExportSegmentsText(previousLine);
+  const lastWidth = ctx.measureText(lastText).width;
+  const orphanWidth = Math.min(100, maxWidth * 0.22);
+
+  if (lastWidth > orphanWidth || !/^[A-Za-z0-9]+$/.test(lastText) || !/,\s*$/.test(previousText)) {
+    return lines;
+  }
+
+  const split = findLastCommaSplit(previousLine);
+  if (!split) {
+    return lines;
+  }
+
+  const candidatePrevious = split.before;
+  const candidateLast = mergeExportSegments(split.after, lastLine);
+  const candidateLastWidth = ctx.measureText(getExportSegmentsText(candidateLast)).width;
+  const minimumPreviousWidth = maxWidth * 0.45;
+
+  if (
+    candidateLastWidth <= maxWidth &&
+    ctx.measureText(getExportSegmentsText(candidatePrevious)).width >= minimumPreviousWidth
+  ) {
+    lines[lines.length - 2] = candidatePrevious;
+    lines[lines.length - 1] = candidateLast;
+  }
+
+  return lines;
+}
+
+function findLastCommaSplit(segments) {
+  const text = getExportSegmentsText(segments);
+  const trimmedEnd = text.search(/\s*$/);
+  const end = trimmedEnd >= 0 ? trimmedEnd : text.length;
+  const commaIndex = text.lastIndexOf(",", end - 2);
+
+  if (commaIndex < 0) {
+    return null;
+  }
+
+  return splitExportSegmentsAt(segments, commaIndex + 1);
+}
+
+function splitExportSegmentsAt(segments, index) {
+  const before = [];
+  const after = [];
+  let cursor = 0;
+
+  segments.forEach((segment) => {
+    const start = cursor;
+    const end = cursor + segment.text.length;
+
+    if (end <= index) {
+      before.push({ ...segment });
+    } else if (start >= index) {
+      after.push({ ...segment });
+    } else {
+      before.push({ ...segment, text: segment.text.slice(0, index - start) });
+      after.push({ ...segment, text: segment.text.slice(index - start) });
+    }
+
+    cursor = end;
+  });
+
+  return {
+    before: trimExportSegmentsEnd(before),
+    after: trimExportSegmentsStart(after)
+  };
+}
+
+function mergeExportSegments(first, second) {
+  return [...first, ...second].reduce((merged, segment) => {
+    if (!segment.text) {
+      return merged;
+    }
+
+    const previous = merged[merged.length - 1];
+    if (previous && previous.highlight === segment.highlight) {
+      previous.text += segment.text;
+    } else {
+      merged.push({ ...segment });
+    }
+    return merged;
+  }, []);
+}
+
+function trimExportSegmentsStart(segments) {
+  const trimmed = segments.map((segment) => ({ ...segment }));
+  while (trimmed.length && !trimmed[0].text.trim()) {
+    trimmed.shift();
+  }
+  if (trimmed.length) {
+    trimmed[0].text = trimmed[0].text.replace(/^\s+/, "");
+  }
+  return trimmed.filter((segment) => segment.text);
+}
+
+function trimExportSegmentsEnd(segments) {
+  const trimmed = segments.map((segment) => ({ ...segment }));
+  while (trimmed.length && !trimmed[trimmed.length - 1].text.trim()) {
+    trimmed.pop();
+  }
+  if (trimmed.length) {
+    const last = trimmed[trimmed.length - 1];
+    last.text = last.text.replace(/\s+$/, "");
+  }
+  return trimmed.filter((segment) => segment.text);
+}
+
+function getExportSegmentsText(segments) {
+  return segments.map((segment) => segment.text).join("");
 }
 
 function splitTextForExportWrap(text) {

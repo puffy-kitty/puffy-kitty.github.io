@@ -823,6 +823,23 @@ a {
   margin: 0;
 }
 
+.notation-color-line {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  margin-bottom: 6px;
+}
+
+.notation-color-line span {
+  color: var(--muted);
+  font-weight: 900;
+}
+
+.notation-color-line p {
+  margin: 0;
+}
+
 .sheet-section {
   margin-top: 16px;
 }

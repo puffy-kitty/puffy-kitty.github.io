@@ -46,7 +46,7 @@
 | R5-6 | 24x | 24 sc | 24 dc |
 | R7-8 | *24x* | *24 sc* | *24 dc* |
 | R9 | *12A* | *12 dec* | *12 dec* |
-| R10 | v, x, v, B, v, *2x*, v, B, v, x, v | inc, sc, inc, bobble, inc, *2 sc*, inc, bobble, inc, sc, inc | inc, dc, inc, bobble, inc, *2 dc*, inc, bobble, inc, dc, inc |
+| R10 | 外半针：v, x, v, B, v, *2x*, v, B, v, x, v | FLO (front loops only): inc, sc, inc, bobble, inc, *2 sc*, inc, bobble, inc, sc, inc | FLO (front loops only): inc, dc, inc, bobble, inc, *2 dc*, inc, bobble, inc, dc, inc |
 | R11 | 8x, *3x*, 7x | 8 sc, *3 sc*, 7 sc | 8 dc, *3 dc*, 7 dc |
 | R12 | 6x, B, x, *3x*, x, B, 5x | 6 sc, bobble, sc, *3 sc*, sc, bobble, 5 sc | 6 dc, bobble, dc, *3 dc*, dc, bobble, 5 dc |
 | R13 | 18x | 18 sc | 18 dc |
