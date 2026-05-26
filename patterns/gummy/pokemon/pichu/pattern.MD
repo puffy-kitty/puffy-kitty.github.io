@@ -76,17 +76,17 @@
 ### zh
 
 - 尾巴：黑色线。
-- 4ch，倒2回钩 3x；翻面3x；3ch，倒1回钩 SL，再钩4ch。
+- 4ch，倒2回钩 3x；翻面3x；再翻面3x；然后起立4ch，倒2回钩 2SL 和 4x。
 
 ### us
 
 - Tail: black yarn.
-- Ch 4, from the 2nd ch work 3 sc; turn, 3 sc; ch 3, turn back 1 stitch and work SL st, then ch 4.
+- Ch 4, from the 2nd ch work 3 sc; turn, 3 sc; turn again, 3 sc; ch 4, turn back 2 stitches and work 2 SL st and 4 sc.
 
 ### uk
 
 - Tail: black yarn.
-- Ch 4, from the 2nd ch work 3 dc; turn, 3 dc; ch 3, turn back 1 stitch and work SL st, then ch 4.
+- Ch 4, from the 2nd ch work 3 dc; turn, 3 dc; turn again, 3 dc; ch 4, turn back 2 stitches and work 2 SL st and 4 dc.
 
 ## assess:ears
 
